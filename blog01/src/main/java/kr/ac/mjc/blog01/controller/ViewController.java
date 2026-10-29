@@ -43,4 +43,13 @@ public class ViewController {
         return mav;
     }
 
+    @GetMapping("/modify/{no}")
+    public ModelAndView modify(@PathVariable("no") long no){
+        ModelAndView mav=new ModelAndView();
+        mav.setViewName("modify");
+        Article article=articleService.getItem(no);
+        mav.addObject("article",article);
+        return mav;
+    }
+
 }

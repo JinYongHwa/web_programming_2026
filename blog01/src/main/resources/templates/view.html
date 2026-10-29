@@ -2,13 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title th:text="${article.title}"></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <style>
+        h1{
+            margin-bottom:16px;
+            padding-bottom:16px;
+            border-bottom:1px solid #eee;
+        }
+        p{
+            min-height:400px;
+            background:#eee;
+            padding:16px;
+            border-radius: 8px;
+        }
+    </style>
+
+
 </head>
 <body>
     <div class="container">
+        <input type="hidden" id="no" th:value="${article.no}">
+
         <h1 th:text="${article.title}"></h1>
         <p th:text="${article.body}"></p>
-
+        <div class="text-center">
+            <a href="/" class="btn btn-primary">목록</a>
+            <button id="delete" class="btn btn-danger">삭제</button>
+            <a th:href="@{'/modify/'+${article.no} }" class="btn btn-primary">수정</a>
+        </div>
     </div>
+
+
+    <script>
+        var no=document.getElementById("no").value
+        var deleteBtn=document.getElementById("delete") //삭제버튼
+        deleteBtn.addEventListener("click",function(){
+            //삭제버튼이 눌렸을때
+            fetch("/api/article/"+no,{
+                method:"delete",
+                headers:{
+                    "content-type":"application/json"
+                }
+            })
+                .then(function(response){
+                    return response.json()
+                })
+                .then(function(json){
+                    if(json.success){   //삭제가 성공했을때
+                        alert("글이 삭제되었습니다")
+                        location.href="/";  //글목록으로 이동
+                    }
+                    else{   //삭제에 실패했을때
+                        alert(json.message)
+                    }
+
+                })
+        })
+    </script>
 </body>
 </html>

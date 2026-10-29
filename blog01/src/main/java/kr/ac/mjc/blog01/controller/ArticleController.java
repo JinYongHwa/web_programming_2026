@@ -1,20 +1,23 @@
 package kr.ac.mjc.blog01.controller;
 
+import jakarta.websocket.server.PathParam;
 import kr.ac.mjc.blog01.dto.ArticleDto;
 import kr.ac.mjc.blog01.dto.ArticleResponse;
 import kr.ac.mjc.blog01.model.Article;
 import kr.ac.mjc.blog01.repository.ArticleRepository;
+import kr.ac.mjc.blog01.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class ArticleController {
 
     @Autowired
     ArticleRepository articleRepository;
+
+    @Autowired
+    ArticleService articleService;
 
     @PostMapping("/api/article")
     public ResponseEntity<ArticleResponse> write(@RequestBody ArticleDto articleDto){
@@ -41,5 +44,25 @@ public class ArticleController {
         response.setArticle(savedArticle);  //글번호가 포함된 데이터베이스에 저장된 article
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/api/article/{no}")
+    public ResponseEntity<ArticleResponse> delete(@PathVariable("no") long no){
+        //서비스에 있는 삭제로직 적용후 삭제 여부 반환받기
+        boolean result=articleService.delete(no);
+        ArticleResponse response=new ArticleResponse();
+        response.setSuccess(result);
+        if(result==false){
+            response.setMessage("존재하지 않는 글입니다");
+        }
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/api/article/modify/{no}")
+    public ResponseEntity<ArticleResponse> modify(@PathVariable("no") long no,@RequestBody ArticleDto articleDto){
+        ArticleResponse response=new ArticleResponse();
+        boolean result=articleService.modify(no,articleDto);
+        response.setSuccess(result);
+        return ResponseEntity.ok(response);
+    }
+
 
 }
