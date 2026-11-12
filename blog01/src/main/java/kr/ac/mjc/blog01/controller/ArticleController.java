@@ -1,11 +1,14 @@
 package kr.ac.mjc.blog01.controller;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.websocket.server.PathParam;
 import kr.ac.mjc.blog01.dto.ArticleDto;
 import kr.ac.mjc.blog01.dto.ArticleResponse;
 import kr.ac.mjc.blog01.model.Article;
+import kr.ac.mjc.blog01.model.User;
 import kr.ac.mjc.blog01.repository.ArticleRepository;
 import kr.ac.mjc.blog01.service.ArticleService;
+import kr.ac.mjc.blog01.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +22,22 @@ public class ArticleController {
     @Autowired
     ArticleService articleService;
 
+    @Autowired
+    UserService userService;
+
     @PostMapping("/api/article")
-    public ResponseEntity<ArticleResponse> write(@RequestBody ArticleDto articleDto){
+    public ResponseEntity<ArticleResponse> write(@RequestBody ArticleDto articleDto, HttpSession session ){
+
         Article article=new Article();
         String title=articleDto.getTitle();
         ArticleResponse response=new ArticleResponse();
+
+        if(session.getAttribute("userId")==null){       //로그인 되어있지 않을경우
+            response.setSuccess(false);
+            response.setMessage("로그인 후 작성 가능합니다");
+            return ResponseEntity.ok(response);
+        }
+
         if(title==null||title.equals("")){  //제목이 null 이거나 제목이 빈값이면
             response.setSuccess(false); //실패한 응답
             response.setMessage("제목을 입력해 주세요");
@@ -35,7 +49,10 @@ public class ArticleController {
             response.setMessage("글 내용에 비속어가 있으면 안됩니다");
             return  ResponseEntity.ok(response);
         }
-
+        //데이터베이스에 글쓸때
+        String email=(String)session.getAttribute("userId");    //로그인된 사용자의 이메일
+        User user=userService.getUserInfo(email);
+        article.setWriter(user);
         article.setTitle(articleDto.getTitle());
         article.setBody(articleDto.getBody());
         Article savedArticle=articleRepository.save(article);

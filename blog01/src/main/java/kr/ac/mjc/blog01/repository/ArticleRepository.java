@@ -14,6 +14,8 @@ public interface ArticleRepository extends JpaRepository<Article,Long>{
 
     List<Article> findAll();        //글 전체 가져오기
 
+    List<Article> findAllByOrderByWriteDateDesc();
+
     @Override
     void deleteById(Long aLong);    //글번호 넣으면 글 삭제하기
 

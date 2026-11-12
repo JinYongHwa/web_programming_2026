@@ -57,4 +57,14 @@ public class UserService {
         response.setUser(optional.get());
         return response;
     }
+
+    public User getUserInfo(String email){
+        Optional<User> optional=userRepository.findOneByEmail(email);
+        if(optional.isEmpty()){
+            return null;
+        }
+        else{
+            return optional.get();
+        }
+    }
 }

@@ -25,6 +25,9 @@ public class Article {
     @Column(name = "writeDate")
     private LocalDateTime writeDate;    //작성시간
 
+    @ManyToOne
+    private User writer;    //작성자
+
     public LocalDateTime getWriteDate() {
         return writeDate;
     }
@@ -55,5 +58,14 @@ public class Article {
 
     public void setNo(long no) {
         this.no = no;
+    }
+
+
+    public User getWriter() {
+        return writer;
+    }
+
+    public void setWriter(User writer) {
+        this.writer = writer;
     }
 }
